@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Time Based Image Display</title>
+		<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+		<style>
+			body, html {
+			height: 100%;
+			margin: 0;
+			display: flex;
+			flex-direction: column;
+			font-family: "Roboto", sans-serif;
+			text-align: center;
+			}
+			img {
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+			max-width: 80%;
+			height: auto;
+			flex-grow: 1;
+			object-fit: contain;
+			width: 40%;
+			height: 40%;
+			margin-bottom: 60px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Which way is the city loop running right now?</h1>
+		<p id="timeDisplay"></p>
+		<img id="timeImage" src="" alt="Image based on time of day">
+		<script>
+			const days_of_week = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+			
+			
+			function time_period(day, hour) {
+			
+			    if (day >= 1 && day <= 5) { // Weekdays
+			        if (hour >= 7 && hour < 10) {
+			            // Weekdays – AM peak
+			            return "weekday AM peak";
+			
+			        } else if (hour >= 10 && hour < 13) {
+			            // Weekdays - AM off-peak
+			            return "weekday AM off-peak";
+			
+			        } else if ((hour >= 13 && hour < 16) || (hour >= 19 || hour < 1)) {
+			            // Weekdays - PM off-peak
+			            return "weekday PM off-peak";
+			        } else if (hour >= 16 && hour < 19) {
+			            // Weekdays - PM peak
+			            return "weekday PM peak";
+			        } else if ((day == 6 || day == 7) && hour >= 1 && hour < 7) {
+			            // Night Network (Fridays & Saturdays after 1am)
+			            return "night network";
+			        }
+			    } else { // Weekends
+			        // Weekends – all day
+			        return "weekend";
+			    }
+
+			}
+			
+			function updateTime() {
+			
+			    var date_local = new Date();
+			    var date_mel = new Date(date_local.toLocaleString("en-US", {
+			        timeZone: "Australia/Melbourne"
+			    }));
+			
+			    var day = date_mel.getDay();
+			    var hour = date_mel.getHours();
+			    var imgElement = document.getElementById("timeImage");
+			    var time_p = time_period(day, hour);
+			
+			    document.getElementById("timeDisplay").textContent = "It is currently " + date_mel.toLocaleTimeString("en-US") + " on a " + days_of_week[day] + " in Melbourne (" + time_p + ")";
+			
+			    if (time_p = "weekday AM peak") {
+			        // Weekdays – AM peak
+			        imgElement.src = "PTUA-new-cityloop_AM-PEAK-1024x873.png";
+			        imgElement.alt = "AM peak";
+			    } else if (time_p = "weekday AM off-peak") {
+			        // Weekdays - AM off-peak
+			        imgElement.src = "PTUA-new-cityloop_AM-OFF-PEAK-1024x873.png";
+			        imgElement.alt = "AM off-peak";
+			    } else if (time_p = "weekday PM off-peak") {
+			        // Weekdays - PM off-peak
+			        imgElement.src = "PTUA-new-cityloop_PM-OFF-PEAK-1024x873.png";
+			        imgElement.alt = "PM off-peak and evening";
+			    } else if (time_p = "weekday PM peak") {
+			        // Weekdays - PM peak
+			        imgElement.src = "PTUA-new-cityloop_PM-PEAK-1024x873.png";
+			        imgElement.alt = "PM Peak";
+			    } else if (time_p = "night network") {
+			        // Night Network (Fridays & Saturdays after 1am)
+			        imgElement.src = "PTUA-new-cityloop_NIGHT-NETWORK-1024x873";
+			        imgElement.alt = "Night network";
+			    } else if (time_p = "weekend") {
+			        // Weekends – all day
+			        imgElement.src = "PTUA-new-cityloop_WEEKEND-1024x873";
+			        imgElement.alt = "Weekend";
+			    }
+			
+			}
+			
+			updateTime();
+			setInterval(updateTime, 1000);
+			      
+			  
+		</script>
+	</body>
+</html>
