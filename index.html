@@ -1,115 +1,233 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<title>City loop direction</title>
-		<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-		<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
-		<style>
-			body, html {
-			height: 100%;
-			margin: 0;
-			display: flex;
-			flex-direction: column;
-			font-family: "Roboto", sans-serif;
-			text-align: center;
-			}
-			img {
-			display: block;
-			margin-left: auto;
-			margin-right: auto;
-			max-width: 80%;
-			height: auto;
-			flex-grow: 1;
-			object-fit: contain;
-			width: 80%;
-			height: 40%;
-			margin-bottom: 60px;
-			}
-		</style>
-	</head>
-	<body>
-		<h1>Which way is the city loop running right now?</h1>
-		<p id="timeDisplay"></p>
-		<img id="timeImage" src="" alt="Image based on time of day">
-		<p id="disclaimer">I am not assocaited with the PTUA - you can find the source material <a href="https://www.ptua.org.au/transport-in-vic/tips/loop/">here</a>. Always check with <a href="http://ptv.vic.gov.au/live-travel-updates">PTV</a> or <a href="http://www.metrotrains.com.au/">Metro</a> for service alterations, especially on weekends.</p>	
-		<script>
-			const days_of_week = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-			
-			
-			function time_period(day, hour) {
-			
-			    if (day >= 1 && day <= 5) { // Weekdays
-			        if (hour >= 7 && hour < 10) {
-			            // Weekdays – AM peak
-			            return "weekday AM peak";
-			
-			        } else if (hour >= 10 && hour < 13) {
-			            // Weekdays - AM off-peak
-			            return "weekday AM off-peak";
-			
-			        } else if ((hour >= 13 && hour < 16) || (hour >= 19 || hour < 1)) {
-			            // Weekdays - PM off-peak
-			            return "weekday PM off-peak";
-			        } else if (hour >= 16 && hour < 19) {
-			            // Weekdays - PM peak
-			            return "weekday PM peak";
-			        } else if ((day == 6 || day == 7) && hour >= 1 && hour < 7) {
-			            // Night Network (Fridays & Saturdays after 1am)
-			            return "night network";
-			        }
-			    } else { // Weekends
-			        // Weekends – all day
-			        return "weekend";
-			    }
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City loop direction</title>
+    <style>
+        :root {
+            --bg-color: #f0f0f0;
+            --text-color: #333333;
+            --container-bg: rgba(255, 255, 255, 0.1);
+            --time-period-color: #ffd700;
+        }
 
-			}
-			
-			function updateTime() {
-			
-			    var date_local = new Date();
-			    var date_mel = new Date(date_local.toLocaleString("en-US", {
-			        timeZone: "Australia/Melbourne"
-			    }));
-			
-			    var day = date_mel.getDay();
-			    var hour = date_mel.getHours();
-			    var imgElement = document.getElementById("timeImage");
-			    var time_p = time_period(day, hour);
-			
-			    document.getElementById("timeDisplay").textContent = "It is currently " + date_mel.toLocaleTimeString("en-US") + " on a " + days_of_week[day] + " in Melbourne (" + time_p + ")";
-			
-			    if (time_p = "weekday AM peak") {
-			        // Weekdays – AM peak
-			        imgElement.src = "PTUA-new-cityloop_AM-PEAK-1024x873.png";
-			        imgElement.alt = "AM peak";
-			    } else if (time_p = "weekday AM off-peak") {
-			        // Weekdays - AM off-peak
-			        imgElement.src = "PTUA-new-cityloop_AM-OFF-PEAK-1024x873.png";
-			        imgElement.alt = "AM off-peak";
-			    } else if (time_p = "weekday PM off-peak") {
-			        // Weekdays - PM off-peak
-			        imgElement.src = "PTUA-new-cityloop_PM-OFF-PEAK-1024x873.png";
-			        imgElement.alt = "PM off-peak and evening";
-			    } else if (time_p = "weekday PM peak") {
-			        // Weekdays - PM peak
-			        imgElement.src = "PTUA-new-cityloop_PM-PEAK-1024x873.png";
-			        imgElement.alt = "PM Peak";
-			    } else if (time_p = "night network") {
-			        // Night Network (Fridays & Saturdays after 1am)
-			        imgElement.src = "PTUA-new-cityloop_NIGHT-NETWORK-1024x873";
-			        imgElement.alt = "Night network";
-			    } else if (time_p = "weekend") {
-			        // Weekends – all day
-			        imgElement.src = "PTUA-new-cityloop_WEEKEND-1024x873";
-			        imgElement.alt = "Weekend";
-			    }
-			
-			}
-			
-			updateTime();
-			setInterval(updateTime, 1000);
-			      
-			  
-		</script>
-	</body>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1a1a1a;
+                --text-color: #ffffff;
+                --container-bg: rgba(255, 255, 255, 0.1);
+                --time-period-color: #ffd700;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            text-align: center;
+        }
+
+        #timeImage {
+            max-width: 100%;
+            max-height: 60vh;
+            object-fit: contain;
+            margin-bottom: 2vh;
+        }
+
+        #currentTime {
+            font-size: 5vw;
+            margin-bottom: 1vh;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        #timePeriod {
+            font-size: 3vw;
+            margin-bottom: 2vh;
+            color: var(--time-period-color);
+        }
+
+        .toggle-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        body.light-mode {
+            --bg-color: #f0f0f0;
+            --text-color: #333333;
+            --container-bg: rgba(255, 255, 255, 0.1);
+            --time-period-color: #ffd700;
+        }
+
+        body.dark-mode {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --container-bg: rgba(255, 255, 255, 0.1);
+            --time-period-color: #ffd700;
+        }
+
+        @media (max-aspect-ratio: 1/1) {
+            #timeImage {
+                max-height: 50vh;
+            }
+            #currentTime {
+                font-size: 8vw;
+            }
+            #timePeriod {
+                font-size: 5vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="toggle-container">
+        <label class="toggle-switch">
+            <input type="checkbox" id="modeToggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+    <div class="container">
+        <img id="timeImage" src="https://www.ptua.org.au/files/2008/2023/07/PTUA-new-cityloop_WEEKEND-1024x873.png" alt="Time of day in Melbourne">
+        <h1 id="currentTime"></h1>
+        <h2 id="timePeriod"></h2>
+    </div>
+
+    <script>
+        function updateTime() {
+            const now = new Date();
+            const melbourneTime = new Date(now.toLocaleString("en-US", {timeZone: "Australia/Melbourne"}));
+            const day = melbourneTime.getDay();
+            const hour = melbourneTime.getHours();
+            const minute = melbourneTime.getMinutes();
+
+            document.getElementById('currentTime').textContent = 
+                `${melbourneTime.toLocaleTimeString("en-US", {timeZone: "Australia/Melbourne"})}`;
+
+            let timePeriod;
+            let imageSrc;
+
+            if (day === 0 || day === 6) {
+                if ((day === 5 || day === 6) && hour >= 1 && hour < 5) {
+                    timePeriod = "Night Network (Fridays & Saturdays after 1am)";
+                    imageSrc = "https://www.ptua.org.au/files/2008/2023/07/PTUA-new-cityloop_NIGHT-NETWORK-1024x873.png";
+                } else {
+                    timePeriod = "Weekend";
+                    imageSrc = "https://www.ptua.org.au/files/2008/2023/07/PTUA-new-cityloop_WEEKEND-1024x873.png";
+                }
+            } else {
+                if ((hour >= 1 && hour < 7) || (hour === 9 && minute < 45) || (hour > 9 && hour < 12) || (hour === 12 && minute <= 45)) {
+                    timePeriod = "Weekday AM Off-Peak";
+                    imageSrc = "https://www.ptua.org.au/files/2008/2023/07/PTUA-new-cityloop_AM-OFF-PEAK-1024x873.png";
+                } else if (hour >= 7 && hour < 9) {
+                    timePeriod = "Weekday AM Peak";
+                    imageSrc = "https://www.ptua.org.au/files/2008/2023/07/PTUA-new-cityloop_AM-PEAK-1024x873.png";
+                } else if ((hour === 12 && minute > 45) || (hour > 12 && hour < 16) || (hour >= 19)) {
+                    timePeriod = "Weekday PM Off-Peak and Evenings";
+                    imageSrc = "https://www.ptua.org.au/files/2008/2023/07/PTUA-new-cityloop_PM-OFF-PEAK-1024x873.png";
+                } else if (hour >= 16 && hour < 19) {
+                    timePeriod = "Weekday PM Peak";
+                    imageSrc = "https://www.ptua.org.au/files/2008/2023/07/PTUA-new-cityloop_PM-PEAK-1024x873.png";
+                }
+            }
+
+            document.getElementById('timePeriod').textContent = timePeriod;
+            document.getElementById('timeImage').src = imageSrc;
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        const modeToggle = document.getElementById('modeToggle');
+        const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+        function setTheme(isDark) {
+            document.body.classList.toggle("dark-mode", isDark);
+            document.body.classList.toggle("light-mode", !isDark);
+            modeToggle.checked = isDark;
+        }
+
+        // Set initial theme based on user's preference
+        setTheme(prefersDarkScheme.matches);
+
+        // Listen for changes to the prefers-color-scheme media query
+        prefersDarkScheme.addListener((e) => setTheme(e.matches));
+
+        // Listen for toggle switch changes
+        modeToggle.addEventListener('change', () => {
+            setTheme(modeToggle.checked);
+        });
+    </script>
+</body>
 </html>
