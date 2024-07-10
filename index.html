@@ -166,6 +166,8 @@
     </div>
 
     <script>
+        let currentTimePeriod = '';
+
         function updateTime() {
             const now = new Date();
             const melbourneTime = new Date(now.toLocaleString("en-US", {timeZone: "Australia/Melbourne"}));
@@ -204,7 +206,12 @@
             }
 
             document.getElementById('timePeriod').textContent = timePeriod;
-            document.getElementById('timeImage').src = imageSrc;
+
+            // Only update the image if the time period has changed
+            if (timePeriod !== currentTimePeriod) {
+                document.getElementById('timeImage').src = imageSrc;
+                currentTimePeriod = timePeriod;
+            }
         }
 
         setInterval(updateTime, 1000);
