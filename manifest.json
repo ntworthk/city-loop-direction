@@ -1,0 +1,22 @@
+{
+  "name": "City loop direction",
+  "short_name": "CLD",
+  "description": "Check current Melbourne city loop direction",
+  "scope": "/city-loop-direction/",
+  "start_url": "/city-loop-direction/",
+  "display": "standalone",
+  "background_color": "#f0f0f0",
+  "theme_color": "#f0f0f0",
+  "icons": [
+    {
+      "src": "/city-loop-direction/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/city-loop-direction/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
